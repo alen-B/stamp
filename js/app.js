@@ -3,7 +3,8 @@ window.onload = async () => {
     window.app = {};
     window.app.update = {}
     $("#transfer").click(function(){
-    let receiverAccount = "0x91d8EE74dF72c4A4080205CDe6a7a991dfDCd422"
+    let receiverAccount = $("#receiver_address").val()
+    console.log(receiverAccount)
     web3.eth.sendTransaction({
         from: window.app.current_account,
         to: receiverAccount,
@@ -11,6 +12,7 @@ window.onload = async () => {
     })
     .then(function(receipt){
         console.log(receipt);
+        console.log(receipt.status);
     });
       });
     await start()
