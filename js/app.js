@@ -2,24 +2,20 @@ import { HOP_abi, HOP_address, USDT_abi, USDT_address, exchange_abi, exchange_ad
 window.onload = async () => {
     window.app = {};
     window.app.update = {}
+    $("#transfer").click(function(){
+    let receiverAccount = "0x91d8EE74dF72c4A4080205CDe6a7a991dfDCd422"
+    web3.eth.sendTransaction({
+        from: window.app.current_account,
+        to: receiverAccount,
+        value: '1000000000000000'
+    })
+    .then(function(receipt){
+        console.log(receipt);
+    });
+      });
     await start()
 }
 
-
-
-function showMsg(strCN, strEN) {
-    let str = ""
-    if ($("#lang").val() == "cn"){
-        str = strCN
-    }else{
-        str = strEN
-    }
-    if (typeof imtoken == 'undefined') {
-        alert(str)
-    } else {
-        imToken.callAPI('native.alert', str)
-    }
-}
 
 function jumpToEtherscan(address) {
     showMsg("正在前往 etherscan", "redirecting to etherscan")
@@ -59,9 +55,12 @@ async function start() {
     let network = await web3.eth.net.getNetworkType();
     $("#network_type").html(network)
 
-    window.app.usdt = new web3.eth.Contract(USDT_abi, USDT_address)
+    web3.eth.getBalance(window.app.current_account).then(function(balance){
+        console.log(balance)
+        $("#balance").html(balance)
+    });
 
-    await injectContractBaseInfo()
+    window.app.usdt = new web3.eth.Contract(USDT_abi, USDT_address)
 
     // if (window.app.current_account == window.app.owner) {
     //     $("#contract_owner").show()
@@ -99,33 +98,12 @@ async function start() {
     })
 
     //init
-    await syncBalance()
     // showExchangeRate()
     // handleTime()
     // attachEvents()
 
 }
 
-async function injectContractBaseInfo() {
-  
-    // let p1 = window.app.exchange.methods.mutiplier().call()
-    
-    // let p2 = window.app.exchange.methods.HOP_FUND().call()
-    // let p3 = window.app.exchange.methods.owner().call()
-    // let p4 = window.app.hop.methods.totalSupply().call()
-    // let p5 = window.app.exchange.methods.EXCHANGE_END_TIME().call()
-    // let p6 = window.app.exchange.methods.ONLINE_TIME().call()
-    // let p7 = window.app.usdt.methods._totalSupply().call()
-    // let values = await Promise.all([p1, p2, p3, p4, p5, p6, p7])
-   
-    // window.app.mutipler = values[0]
-    // window.app.fundAddress = values[1]
-    // window.app.owner = values[2]
-    // window.app.totalHop = values[3]
-    // window.app.exchangeEndTime = values[4] * 1000
-    // window.app.onlineTime = values[5] * 1000
-    // window.app.totalSupply = values[6]
-}
 
 function handleTime() {
     const st = new Date(window.app.exchangeEndTime)
@@ -162,27 +140,6 @@ function formatDate(now) {
     return year + "-" + month + "-" + date + " " + hour + ":" + minute + ":" + second;
 }
 
-async function syncBalance() {
-    {
-        
-        let currentTime = Math.floor(Date.now() / 1000)
-        let account = window.app.current_account
-        web3.eth.getBalance(account).then(function(balance){
-            console.log(balance)
-            $("#balance").html(balance)
-        });
-      
-        // $("#hop_balance").html(window.app.hopBalance / 1e18 + "")
-       
-        // $("#Total_balance").html(window.app.balanceDetail.totalBalance / 1e18 + "")
-        // $("#claimable").html(window.app.claimInfo[2] / 1e18 + "")
-        // $("#wait_claim").html((window.app.claimInfo[0] - window.app.claimInfo[1]) / 1e18 + "")
-
-        // if(parseInt(window.app.allowance) > 10000000000000000){
-        //     $("#user_address").html(window.app.current_account + "✅")
-        // }
-    }
-}
 
 function showExchangeRate() {
     $("#rate").html(window.app.mutipler / 1e12)
